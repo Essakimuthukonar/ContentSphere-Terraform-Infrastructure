@@ -1,0 +1,599 @@
+# ContentSphere
+
+## Infrastructure as Code Deployment and Automation using Terraform
+
+### Project Report
+
+---
+
+## 1. Student Information
+
+**Student Name:** Essakimuthu Shanmugam Konar
+
+**Course:** DevOps / Cloud
+
+**Institute:** IT Vedant
+
+**Project Name:** ContentSphere
+
+**AWS Region:** ap-south-1
+
+**Environment:** dev
+
+---
+
+# 2. Introduction
+
+Infrastructure as Code is a DevOps practice that allows infrastructure to be defined, provisioned, configured, and managed using machine-readable configuration files.
+
+The ContentSphere project demonstrates Infrastructure as Code using Terraform on Amazon Web Services.
+
+Instead of manually creating AWS resources through the AWS Management Console, Terraform configuration files are used to define the required infrastructure.
+
+The project also demonstrates reusable Terraform modules, remote state management, infrastructure drift detection, and AWS CloudFormation.
+
+---
+
+# 3. Project Objective
+
+The main objectives of this project are:
+
+1. Understand Infrastructure as Code.
+2. Configure Terraform with AWS.
+3. Provision AWS infrastructure using Terraform.
+4. Create reusable Terraform modules.
+5. Use Terraform variables and outputs.
+6. Demonstrate Terraform lifecycle management.
+7. Configure remote Terraform state using Amazon S3.
+8. Demonstrate Terraform state management.
+9. Detect infrastructure drift.
+10. Create an equivalent AWS CloudFormation template.
+11. Deploy the infrastructure using CloudFormation.
+12. Maintain the project using Git and GitHub.
+
+---
+
+# 4. Technologies Used
+
+The following technologies were used:
+
+* Terraform
+* Amazon Web Services
+* Amazon EC2
+* Amazon VPC
+* Amazon S3
+* AWS CloudFormation
+* AWS CLI
+* Apache HTTP Server
+* Git
+* GitHub
+* Visual Studio Code
+* PowerShell
+
+---
+
+# 5. AWS Infrastructure
+
+The Terraform infrastructure consists of:
+
+* VPC
+* Public Subnet
+* Internet Gateway
+* Route Table
+* Route Table Association
+* Security Group
+* EC2 Instance
+* Elastic IP
+* S3 Bucket
+* S3 Bucket Versioning
+
+---
+
+# 6. VPC Configuration
+
+A dedicated VPC was created for the ContentSphere project.
+
+CIDR:
+
+```text
+10.0.0.0/16
+```
+
+The VPC provides the network environment for the ContentSphere infrastructure.
+
+DNS support and DNS hostnames were enabled.
+
+---
+
+# 7. Public Subnet
+
+A public subnet was created inside the VPC.
+
+CIDR:
+
+```text
+10.0.1.0/24
+```
+
+Availability Zone:
+
+```text
+ap-south-1a
+```
+
+The subnet was configured to assign public IP addresses to resources launched within it.
+
+---
+
+# 8. Internet Gateway and Route Table
+
+An Internet Gateway was attached to the VPC.
+
+A route table was created with:
+
+```text
+Destination: 0.0.0.0/0
+Target: Internet Gateway
+```
+
+This allows resources in the public subnet to communicate with the internet.
+
+---
+
+# 9. Security Group
+
+A security group was created for the EC2 instance.
+
+The following inbound ports were configured:
+
+| Port | Protocol | Purpose |
+| ---- | -------- | ------- |
+| 22   | TCP      | SSH     |
+| 80   | TCP      | HTTP    |
+
+Outbound traffic was allowed so that the EC2 instance could communicate with required external services.
+
+---
+
+# 10. EC2 Instance
+
+An EC2 instance was provisioned using Terraform.
+
+Configuration:
+
+```text
+Instance Type: t3.micro
+Region: ap-south-1
+```
+
+The EC2 instance was configured using Terraform user data.
+
+Apache HTTP Server was installed automatically during instance initialization.
+
+---
+
+# 11. ContentSphere Website
+
+Terraform user data automatically installs Apache and creates the ContentSphere website.
+
+The website contains:
+
+```text
+ContentSphere
+
+Infrastructure Provisioned using Terraform
+
+Student: Essakimuthu Shanmugam Konar
+Batch: IT Vedant
+Region: ap-south-1
+Environment: dev
+```
+
+This demonstrates that Terraform can provision both infrastructure and initial server configuration.
+
+---
+
+# 12. Elastic IP
+
+An Elastic IP was associated with the EC2 instance.
+
+The Elastic IP provides a stable public address for accessing the ContentSphere web server.
+
+---
+
+# 13. S3 Storage
+
+An S3 bucket was created for ContentSphere.
+
+The project bucket is used as AWS object storage and demonstrates Terraform management of S3 resources.
+
+S3 bucket versioning was enabled.
+
+---
+
+# 14. Terraform Modules
+
+Reusable Terraform modules were created to improve project organization and reusability.
+
+The project contains:
+
+```text
+modules/
+├── vpc/
+├── security-group/
+├── ec2/
+└── s3/
+```
+
+Each module contains:
+
+```text
+main.tf
+variables.tf
+outputs.tf
+```
+
+The root `main.tf` calls these modules.
+
+This structure allows the same modules to be reused in future DevOps projects.
+
+---
+
+# 15. Variables
+
+Terraform variables were used to avoid hardcoding infrastructure configuration.
+
+Examples include:
+
+```text
+project_name
+environment
+vpc_cidr
+subnet_cidr
+availability_zone
+ami_id
+instance_type
+key_name
+```
+
+The actual values are supplied through:
+
+```text
+terraform.tfvars
+```
+
+---
+
+# 16. Terraform Outputs
+
+Terraform outputs were created to display important infrastructure information.
+
+Examples:
+
+```text
+VPC ID
+Subnet ID
+Security Group ID
+EC2 Instance ID
+Public IP
+Elastic IP
+S3 Bucket Name
+```
+
+This makes it easier to identify and use provisioned AWS resources.
+
+---
+
+# 17. Terraform Lifecycle
+
+The Terraform lifecycle was demonstrated using:
+
+```bash
+terraform init
+terraform validate
+terraform plan
+terraform apply
+terraform output
+terraform state list
+```
+
+Terraform was used to create and manage the infrastructure.
+
+Terraform can also remove infrastructure using:
+
+```bash
+terraform destroy
+```
+
+---
+
+# 18. Terraform State Management
+
+Terraform maintains a state file that records the infrastructure managed by Terraform.
+
+The state allows Terraform to compare the desired configuration with the actual infrastructure in AWS.
+
+The state resources were organized using module addresses.
+
+Example:
+
+```text
+module.vpc.aws_vpc.this
+module.vpc.aws_subnet.this
+module.security_group.aws_security_group.this
+module.ec2.aws_instance.this
+module.ec2.aws_eip.this
+module.s3.aws_s3_bucket.this
+```
+
+---
+
+# 19. Remote State
+
+Remote Terraform state was configured using Amazon S3.
+
+Remote state bucket:
+
+```text
+contentsphere-terraform-state-2026-essaki
+```
+
+State path:
+
+```text
+contentsphere/terraform.tfstate
+```
+
+S3 versioning was enabled.
+
+Remote state provides centralized state storage and helps prevent loss of the local state file.
+
+---
+
+# 20. Infrastructure Drift
+
+Infrastructure drift occurs when the actual AWS infrastructure differs from the configuration managed by Terraform.
+
+A test tag was manually added to the EC2 instance outside Terraform:
+
+```text
+DriftTest = ChangedOutsideTerraform
+```
+
+Terraform was then executed using:
+
+```bash
+terraform plan
+```
+
+Terraform detected the external change and showed that the manually added tag was not present in the Terraform configuration.
+
+This successfully demonstrated infrastructure drift detection.
+
+---
+
+# 21. AWS CloudFormation
+
+An equivalent ContentSphere infrastructure template was created using AWS CloudFormation.
+
+File:
+
+```text
+cloudformation/contentsphere-stack.yaml
+```
+
+The template defines:
+
+* VPC
+* Subnet
+* Internet Gateway
+* Route Table
+* Security Group
+* EC2
+* S3
+
+The template was first validated using AWS CLI.
+
+Command:
+
+```bash
+aws cloudformation validate-template --template-body file://cloudformation/contentsphere-stack.yaml
+```
+
+---
+
+# 22. CloudFormation Deployment
+
+The CloudFormation template was deployed from the VS Code PowerShell terminal using AWS CLI.
+
+Deployment command:
+
+```bash
+aws cloudformation deploy --template-file cloudformation/contentsphere-stack.yaml --stack-name ContentSphere-CF-Demo --parameter-overrides KeyName=terraform Environment=dev --region ap-south-1
+```
+
+The resulting CloudFormation stack was:
+
+```text
+ContentSphere-CF-Demo
+```
+
+The stack successfully reached:
+
+```text
+CREATE_COMPLETE
+```
+
+This confirms that ContentSphere infrastructure was successfully demonstrated using both Terraform and AWS CloudFormation.
+
+---
+
+# 23. Terraform and CloudFormation Comparison
+
+| Feature         | Terraform         | CloudFormation            |
+| --------------- | ----------------- | ------------------------- |
+| Developer       | HashiCorp         | AWS                       |
+| Configuration   | HCL               | YAML/JSON                 |
+| Cloud Support   | Multi-cloud       | AWS                       |
+| State           | Terraform State   | Managed by CloudFormation |
+| Modules         | Terraform Modules | Nested Stacks             |
+| AWS Integration | Very Good         | Native                    |
+| Main Purpose    | General IaC       | AWS-native IaC            |
+
+Terraform was selected as the primary tool for the project because of its reusable module system and multi-cloud capability.
+
+CloudFormation was implemented to demonstrate AWS-native Infrastructure as Code.
+
+---
+
+# 24. AWS CDK
+
+AWS CDK is another AWS Infrastructure as Code tool that allows infrastructure to be defined using programming languages such as TypeScript, Python, Java, C#, and Go.
+
+For this project, CDK was reviewed conceptually and compared with Terraform and CloudFormation.
+
+A separate CDK deployment was not implemented because Terraform was the primary IaC implementation and CloudFormation was used as the AWS-native comparison.
+
+---
+
+# 25. Git and GitHub
+
+The project was organized as a Git repository.
+
+The repository contains:
+
+```text
+README.md
+Terraform files
+Terraform modules
+CloudFormation template
+Screenshots
+Project documentation
+```
+
+Sensitive files such as:
+
+```text
+terraform.tfvars
+*.tfstate
+.terraform/
+```
+
+are excluded using `.gitignore`.
+
+---
+
+# 26. Project Structure
+
+```text
+ContentSphere-Terraform-Infrastructure/
+│
+├── README.md
+├── terraform.tf
+├── provider.tf
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── terraform.tfvars.example
+│
+├── modules/
+│   ├── vpc/
+│   ├── security-group/
+│   ├── ec2/
+│   └── s3/
+│
+├── cloudformation/
+│   └── contentsphere-stack.yaml
+│
+├── screenshots/
+│
+└── documentation/
+    └── Project_Report.pdf
+```
+
+---
+
+# 27. Results
+
+The ContentSphere project successfully demonstrated Infrastructure as Code using Terraform.
+
+The following activities were completed:
+
+* AWS provider configuration
+* VPC provisioning
+* Subnet provisioning
+* Internet Gateway provisioning
+* Route Table configuration
+* Security Group creation
+* EC2 provisioning
+* Apache web server deployment
+* Elastic IP association
+* S3 bucket creation
+* Terraform variables
+* Terraform outputs
+* Terraform reusable modules
+* Terraform state management
+* Remote state using S3
+* Infrastructure drift detection
+* CloudFormation template creation
+* CloudFormation stack deployment
+* Git project organization
+
+---
+
+# 28. Conclusion
+
+The ContentSphere project provided practical experience in Infrastructure as Code and DevOps automation.
+
+Terraform was used to automate AWS infrastructure provisioning and management. Reusable modules were created to make the infrastructure easier to maintain and reuse.
+
+Remote state management using Amazon S3 demonstrated centralized Terraform state storage.
+
+Infrastructure drift detection demonstrated how Terraform identifies configuration changes made outside the Infrastructure as Code workflow.
+
+AWS CloudFormation was also implemented and successfully deployed as an AWS-native Infrastructure as Code solution.
+
+Overall, the project demonstrates how DevOps engineers can replace repetitive manual infrastructure configuration with automated, repeatable, and version-controlled Infrastructure as Code.
+
+---
+
+# 29. Screenshots
+
+The following screenshots should be included as project evidence:
+
+1. Terraform initialization
+2. Terraform validation
+3. Terraform plan
+4. Terraform apply
+5. AWS infrastructure
+6. ContentSphere website
+7. Terraform modules
+8. Terraform state
+9. Remote S3 state
+10. Infrastructure drift
+11. CloudFormation template
+12. CloudFormation CREATE_COMPLETE
+13. CloudFormation resources
+14. GitHub repository
+
+---
+
+# 30. Final Project Status
+
+**Terraform Infrastructure:** Completed
+
+**Terraform Modules:** Completed
+
+**Remote State:** Completed
+
+**Drift Detection:** Completed
+
+**CloudFormation Template:** Completed
+
+**CloudFormation Deployment:** Completed
+
+**GitHub Documentation:** Prepared
+
+**Project:** ContentSphere
+
+**Student:** Essakimuthu Shanmugam Konar

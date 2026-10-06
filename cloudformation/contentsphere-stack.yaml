@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: ContentSphere infrastructure using AWS CloudFormation
+
+Parameters:
+
+  Environment:
+    Type: String
+    Default: dev
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: terraform
+
+Resources:
+
+  ContentSphereVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.1.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: ContentSphere-CF-VPC
+
+  ContentSphereSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ContentSphereVPC
+      CidrBlock: 10.1.1.0/24
+      AvailabilityZone: ap-south-1a
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: ContentSphere-CF-Subnet
+
+  ContentSphereInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: ContentSphere-CF-IGW
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref ContentSphereVPC
+      InternetGatewayId: !Ref ContentSphereInternetGateway
+
+  ContentSphereRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ContentSphereVPC
+      Tags:
+        - Key: Name
+          Value: ContentSphere-CF-RouteTable
+
+  DefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref ContentSphereRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref ContentSphereInternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref ContentSphereSubnet
+      RouteTableId: !Ref ContentSphereRouteTable
+
+  ContentSphereSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ContentSphere security group
+      VpcId: !Ref ContentSphereVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: ContentSphere-CF-SG
+
+  ContentSphereEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-08e3b3155fc937a94
+      InstanceType: t3.micro
+      SubnetId: !Ref ContentSphereSubnet
+      SecurityGroupIds:
+        - !Ref ContentSphereSecurityGroup
+      KeyName: !Ref KeyName
+      Tags:
+        - Key: Name
+          Value: ContentSphere-CF-EC2
+
+  ContentSphereBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: contentsphere-cf-storage-2026-essaki
+      VersioningConfiguration:
+        Status: Enabled
+
+Outputs:
+
+  VPCId:
+    Value: !Ref ContentSphereVPC
+
+  EC2InstanceId:
+    Value: !Ref ContentSphereEC2
+
+  S3BucketName:
+    Value: !Ref ContentSphereBucket
